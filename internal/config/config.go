@@ -40,9 +40,6 @@ func parseFile(data []byte) model.PackConfig {
 }
 
 func validateConfig(packConfig model.PackConfig) bool {
-	// todo remove
-	return true
-
 	if packConfig.Name == "" || packConfig.Author == "" || packConfig.Version == "" {
 		fmt.Println("Config metadata is empty!")
 		return false
