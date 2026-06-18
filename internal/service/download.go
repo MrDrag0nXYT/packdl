@@ -37,19 +37,23 @@ func runFileDownload(client *http.Client, baseDir string, file model.File) error
 		fmt.Printf("File '%v' already exist, skipping download\n", outName)
 	}
 
-	isHashValid, err := verifyHash(outPath, file.Sha1)
+	return validateHash(outPath, file.Sha1)
+}
+
+func validateHash(filePath string, sha1Hash string) error {
+	isHashValid, err := verifyHash(filePath, sha1Hash)
 
 	if err != nil && errors.Is(err, ErrEmptyConfigHashsum) {
-		fmt.Printf("Hashsum of file '%v' could not be checked: config hash is empty!\n", outName)
+		fmt.Printf("Hashsum of file '%v' could not be checked: config hash is empty!\n", filePath)
 		return err
 	}
 
 	if isHashValid {
-		fmt.Printf("Hashsum of file '%v' is valid!\n", outName)
+		fmt.Printf("Hashsum of file '%v' is valid!\n", filePath)
 
 	} else {
-		fmt.Printf("Hashsum of file '%v' invalid! Deleting...\n", outName)
-		if err := os.Remove(outPath); err != nil {
+		fmt.Printf("Hashsum of file '%v' invalid! Deleting...\n", filePath)
+		if err := os.Remove(filePath); err != nil {
 			return err
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"packdl/internal/config"
 	"packdl/internal/service"
+	"packdl/internal/util"
 )
 
 var Version = "unknown_devbuild"
@@ -26,4 +27,6 @@ func main() {
 	default:
 		service.DownloadPack(command)
 	}
+
+	util.ClickToExit()
 }

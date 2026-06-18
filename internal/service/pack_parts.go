@@ -5,22 +5,44 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"packdl/internal/config"
 	"packdl/internal/model"
 	"path/filepath"
 )
 
-var ErrNoLinkProviden = errors.New("No link providen")
+var ErrNoLinkOrFileProviden = errors.New("No link or file providen")
 
 func downloadCore(client *http.Client, baseDir string, core model.Core) error {
-	if core.File.DownloadUrl == "" {
-		return ErrNoLinkProviden
+	coreName := config.Unknown
+	if core.Name != "" {
+		coreName = core.Name
 	}
 
-	if err := runFileDownload(client, baseDir, core.File); err != nil {
-		return err
+	coreGameVersion := config.Unknown
+	if core.GameVersion != "" {
+		coreGameVersion = core.GameVersion
 	}
 
-	return nil
+	coreBuild := config.Unknown
+	if core.Build != "" {
+		coreBuild = core.Build
+	}
+
+	fmt.Printf("Downloading '%v' version %v #%v into '%v'\n", coreName, coreGameVersion, coreBuild, baseDir)
+
+	if core.File.DownloadUrl != "" {
+		if err := runFileDownload(client, baseDir, core.File); err != nil {
+			return err
+		}
+	}
+
+	if core.File.Name != "" && core.File.Sha1 != "" {
+		targetFile := filepath.Join(baseDir, core.File.Name)
+
+		return validateHash(targetFile, core.File.Sha1)
+	}
+
+	return ErrNoLinkOrFileProviden
 }
 
 func downloadModifications(client *http.Client, baseDir string, mods []model.Modification, modsType model.ModificationType) error {
@@ -36,17 +58,34 @@ func downloadModifications(client *http.Client, baseDir string, mods []model.Mod
 	counter := 0
 
 	for index, mod := range mods {
-		if mod.File.DownloadUrl == "" {
-			return ErrNoLinkProviden
+		modName := config.Unknown
+		if mod.Name != "" {
+			modName = mod.Name
 		}
 
-		if mod.Name != "" {
-			fmt.Printf("#%v. Downloading '%v'\n", index+1, mod.Name)
+		modVersion := config.Unknown
+		if mod.Version != "" {
+			modVersion = mod.Version
+		}
 
+		fmt.Printf("#%v. Downloading '%v' version %v\n", index+1, modName, modVersion)
+
+		if mod.File.DownloadUrl != "" {
 			if err := runFileDownload(client, baseDir, mod.File); err == nil {
 				counter++
+				continue
 			}
 		}
+
+		fmt.Println("No link providen. Download skipped")
+
+		targetFile := filepath.Join(baseDir, mod.File.Name)
+		if err := validateHash(targetFile, mod.File.Sha1); err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		counter++
 	}
 
 	fmt.Printf("Success: %v, %v of %v\n", folderName, counter, len(mods))
