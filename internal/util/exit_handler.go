@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/eiannone/keyboard"
 )
@@ -12,4 +13,5 @@ func ClickToExit() {
 	defer keyboard.Close()
 
 	keyboard.GetKey()
+	os.Exit(1)
 }

@@ -23,6 +23,7 @@ func main() {
 	switch command {
 	case "version":
 		fmt.Printf("packdl, version %v\n", Version)
+		return
 
 	default:
 		service.DownloadPack(command)

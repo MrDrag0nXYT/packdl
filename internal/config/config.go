@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"packdl/internal/model"
+	"packdl/internal/util"
 )
 
 func LoadPackConfig(configPath string) model.PackConfig {
@@ -12,8 +13,7 @@ func LoadPackConfig(configPath string) model.PackConfig {
 	packConfig := parseFile(data)
 
 	if !validateConfig(packConfig) {
-		fmt.Println("Exiting...")
-		os.Exit(1)
+		util.ClickToExit()
 	}
 
 	return packConfig
