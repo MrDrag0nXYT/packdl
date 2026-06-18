@@ -28,9 +28,9 @@ func runFileDownload(client *http.Client, baseDir string, file model.File) error
 
 	if _, err := os.Stat(outPath); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			fmt.Printf("Downloading '%v'\n", outName)
-
-			saveFile(resp, outPath)
+			// fmt.Printf("Downloading '%v'\n", outName)
+			saveFile(resp, outName, outPath)
+			fmt.Println("")
 		}
 
 	} else {
@@ -61,7 +61,7 @@ func validateHash(filePath string, sha1Hash string) error {
 	return nil
 }
 
-func saveFile(resp *http.Response, filePath string) error {
+func saveFile(resp *http.Response, outName string, filePath string) error {
 	tempFilePath := filePath + ".tmp"
 	out, err := os.Create(tempFilePath)
 
@@ -69,7 +69,12 @@ func saveFile(resp *http.Response, filePath string) error {
 		return fmt.Errorf("Error while creating file: %w", err)
 	}
 
-	if _, err = io.Copy(out, resp.Body); err != nil {
+	pw := ProgressWriter{
+		FileName:   outName,
+		TotalBytes: uint64(resp.ContentLength),
+	}
+
+	if _, err = io.Copy(out, io.TeeReader(resp.Body, &pw)); err != nil {
 		os.Remove(tempFilePath)
 		return fmt.Errorf("Error while writing file: %w", err)
 	}

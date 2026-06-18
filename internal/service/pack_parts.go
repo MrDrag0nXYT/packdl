@@ -34,6 +34,7 @@ func downloadCore(client *http.Client, baseDir string, core model.Core) error {
 		if err := runFileDownload(client, baseDir, core.File); err != nil {
 			return err
 		}
+		return nil
 	}
 
 	if core.File.Name != "" && core.File.Sha1 != "" {
