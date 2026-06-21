@@ -9,26 +9,26 @@ type File struct {
 type Core struct {
 	Name        string `json:"name"`
 	GameVersion string `json:"gameVersion"`
-	Build       string `json:"build"`
+	Build       string `json:"build,omitempty"`
 	File        File   `json:"file"`
 }
 
 type Modification struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
-	Website string `json:"website"`
+	Website string `json:"website,omitempty"`
 	File    File   `json:"file"`
 }
 
 type PackConfig struct {
 	Name        string         `json:"name"`
 	Version     string         `json:"version"`
-	Description string         `json:"description"`
+	Description string         `json:"description,omitempty"`
 	Author      string         `json:"author"`
-	Website     string         `json:"website"`
-	Core        Core           `json:"core"`
-	Plugins     []Modification `json:"plugins"`
-	Mods        []Modification `json:"mods"`
+	Website     string         `json:"website,omitempty"`
+	Core        Core           `json:"core,omitempty"`
+	Plugins     []Modification `json:"plugins,omitempty"`
+	Mods        []Modification `json:"mods,omitempty"`
 }
 
 type ModificationType int

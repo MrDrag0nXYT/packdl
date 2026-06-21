@@ -6,26 +6,57 @@ import (
 	"os"
 	"packdl/internal/model"
 	"packdl/internal/util"
+	"path/filepath"
 )
 
-func LoadPackConfig(configPath string) model.PackConfig {
-	data := openFile(configPath)
+func LoadPackConfigIfExist(configPath string) (model.PackConfig, string, error) {
+	data, baseDir, err := openFile(configPath)
+	if err != nil {
+		return model.PackConfig{}, "", err
+	}
 	packConfig := parseFile(data)
+
+	return packConfig, baseDir, nil
+}
+
+func LoadPackConfig(configPath string) (model.PackConfig, string) {
+	packConfig, baseDir, err := LoadPackConfigIfExist(configPath)
+	if err != nil {
+		fmt.Println("Error while opening file:", err)
+		os.Exit(1)
+	}
 
 	if !validateConfig(packConfig) {
 		util.ClickToExit()
 	}
 
-	return packConfig
+	return packConfig, baseDir
 }
 
-func openFile(configPath string) []byte {
+func SavePackConfig(packConfig model.PackConfig, configPath string) {
+	data := serializeConfig(packConfig)
+	saveFile(data, configPath)
+}
+
+func openFile(configPath string) ([]byte, string, error) {
+	stat, err := os.Stat(configPath)
+	if err != nil {
+		return nil, "", err
+	}
+
+	baseDir := filepath.Dir(configPath)
+
+	if stat.IsDir() {
+		baseDir = configPath
+		configPath = filepath.Join(configPath, DefaultConfigFileName)
+	}
+
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		fmt.Println("Error while opening file:", err)
-		os.Exit(1)
+		return nil, "", err
 	}
-	return data
+
+	return data, baseDir, nil
 }
 
 func parseFile(data []byte) model.PackConfig {
@@ -37,6 +68,20 @@ func parseFile(data []byte) model.PackConfig {
 	}
 
 	return packConfig
+}
+
+func serializeConfig(packConfig model.PackConfig) []byte {
+	data, err := json.Marshal(packConfig)
+	if err != nil {
+		fmt.Println("An error occured while parsing config for save!")
+		os.Exit(1)
+	}
+
+	return data
+}
+
+func saveFile(data []byte, configPath string) error {
+	return os.WriteFile(configPath, data, 0666)
 }
 
 func validateConfig(packConfig model.PackConfig) bool {

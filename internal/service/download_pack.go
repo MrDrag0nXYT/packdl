@@ -5,12 +5,10 @@ import (
 	"net/http"
 	"packdl/internal/config"
 	"packdl/internal/model"
-	"path/filepath"
 )
 
 func DownloadPack(configPath string) {
-	packConfig := config.LoadPackConfig(configPath)
-	baseDir := filepath.Dir(configPath)
+	packConfig, baseDir := config.LoadPackConfig(configPath)
 
 	client := http.Client{}
 

@@ -25,6 +25,9 @@ func main() {
 		fmt.Printf("packdl, version %v\n", Version)
 		return
 
+	case "generate", "gen":
+		service.GeneratePackConfig(launchArgs)
+
 	default:
 		service.DownloadPack(command)
 	}

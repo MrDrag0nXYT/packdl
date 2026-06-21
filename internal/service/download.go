@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"packdl/internal/model"
+	"packdl/internal/util"
 	"path"
 	"path/filepath"
 )
@@ -41,9 +42,9 @@ func runFileDownload(client *http.Client, baseDir string, file model.File) error
 }
 
 func validateHash(filePath string, sha1Hash string) error {
-	isHashValid, err := verifyHash(filePath, sha1Hash)
+	isHashValid, err := util.VerifyHash(filePath, sha1Hash)
 
-	if err != nil && errors.Is(err, ErrEmptyConfigHashsum) {
+	if err != nil && errors.Is(err, util.ErrEmptyConfigHashsum) {
 		fmt.Printf("Hashsum of file '%v' could not be checked: config hash is empty!\n", filePath)
 		return err
 	}
