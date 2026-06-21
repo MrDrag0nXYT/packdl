@@ -12,7 +12,7 @@ import (
 
 var ErrNoLinkOrFileProviden = errors.New("No link or file providen")
 
-func downloadCore(client *http.Client, baseDir string, core model.Core) error {
+func downloadCore(client *http.Client, clientVersion string, baseDir string, core model.Core) error {
 	coreName := config.Unknown
 	if core.Name != "" {
 		coreName = core.Name
@@ -31,7 +31,7 @@ func downloadCore(client *http.Client, baseDir string, core model.Core) error {
 	fmt.Printf("Downloading '%v' version %v #%v into '%v'\n", coreName, coreGameVersion, coreBuild, baseDir)
 
 	if core.File.DownloadUrl != "" {
-		if err := runFileDownload(client, baseDir, core.File); err != nil {
+		if err := runFileDownload(client, clientVersion, baseDir, core.File); err != nil {
 			return err
 		}
 		return nil
@@ -46,7 +46,7 @@ func downloadCore(client *http.Client, baseDir string, core model.Core) error {
 	return ErrNoLinkOrFileProviden
 }
 
-func downloadModifications(client *http.Client, baseDir string, mods []model.Modification, modsType model.ModificationType) error {
+func downloadModifications(client *http.Client, clientVersion string, baseDir string, mods []model.Modification, modsType model.ModificationType) error {
 	folderName := modsType.GetFolder()
 	baseDir = filepath.Join(baseDir, folderName)
 
@@ -72,7 +72,7 @@ func downloadModifications(client *http.Client, baseDir string, mods []model.Mod
 		fmt.Printf("#%v. Downloading '%v' version %v\n", index+1, modName, modVersion)
 
 		if mod.File.DownloadUrl != "" {
-			if err := runFileDownload(client, baseDir, mod.File); err == nil {
+			if err := runFileDownload(client, clientVersion, baseDir, mod.File); err == nil {
 				counter++
 				continue
 			}

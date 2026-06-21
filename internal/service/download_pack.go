@@ -7,23 +7,23 @@ import (
 	"packdl/internal/model"
 )
 
-func DownloadPack(configPath string) {
+func DownloadPack(configPath string, clientVersion string) {
 	packConfig, baseDir := config.LoadPackConfig(configPath)
 
 	client := http.Client{}
 
-	if err := downloadCore(&client, baseDir, packConfig.Core); err != nil {
+	if err := downloadCore(&client, clientVersion, baseDir, packConfig.Core); err != nil {
 		fmt.Println(err)
 	}
 
 	if len(packConfig.Plugins) > 0 {
-		if err := downloadModifications(&client, baseDir, packConfig.Plugins, model.Plugin); err != nil {
+		if err := downloadModifications(&client, clientVersion, baseDir, packConfig.Plugins, model.Plugin); err != nil {
 			fmt.Println(err)
 		}
 	}
 
 	if len(packConfig.Mods) > 0 {
-		if err := downloadModifications(&client, baseDir, packConfig.Mods, model.Mod); err != nil {
+		if err := downloadModifications(&client, clientVersion, baseDir, packConfig.Mods, model.Mod); err != nil {
 			fmt.Println(err)
 		}
 	}

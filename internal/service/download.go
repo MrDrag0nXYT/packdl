@@ -13,8 +13,15 @@ import (
 	"path/filepath"
 )
 
-func runFileDownload(client *http.Client, baseDir string, file model.File) error {
-	resp, err := client.Get(file.DownloadUrl)
+func runFileDownload(client *http.Client, clientVersion string, baseDir string, file model.File) error {
+	req, err := http.NewRequest("GET", file.DownloadUrl, nil)
+	if err != nil {
+		return fmt.Errorf("Error while downloading file: %w", err)
+	}
+
+	req.Header.Set("User-Agent", fmt.Sprintf("packdl/%v", clientVersion))
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("Error while downloading file: %w", err)
 	}
