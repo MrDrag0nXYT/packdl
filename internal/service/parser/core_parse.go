@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"packdl/internal/model"
@@ -19,11 +20,18 @@ const (
 
 var ErrVersionDataNotFound = errors.New(coreVersionDataFileName + " not found!")
 
-func ParseCore(baseDir string) model.Core {
-	corePath := filepath.Join(baseDir, defaultCoreName)
+func ParseCore(baseDir string, coreFile string) model.Core {
+	if coreFile == "" {
+		coreFile = defaultCoreName
+	}
+	coreFile = filepath.Base(coreFile)
+	corePath := filepath.Join(baseDir, coreFile)
+
+	fmt.Printf("Reading pack core: '%v'\n", coreFile)
 
 	stat, err := os.Stat(corePath)
 	if err != nil {
+		fmt.Println("Core not found. Skipping...")
 		return model.Core{}
 	}
 

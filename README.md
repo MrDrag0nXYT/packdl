@@ -24,7 +24,9 @@ Currently project in **early development state**, so it could be unstable for pr
 ```shell
 packdl
   </path/to/pack> - download pack from config
-  gen(generate) </path/to/pack> - generate config for pack
+  gen(generate) - generate config for pack
+    -core core.jar - set server core jar file
+    </path/to/pack>
   ver(version) - show version
 ```
 

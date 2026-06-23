@@ -1,4 +1,4 @@
-package service
+package cmd
 
 import (
 	"errors"
@@ -9,16 +9,18 @@ import (
 	"packdl/internal/service/parser"
 	"packdl/internal/util"
 	"path/filepath"
+	"strings"
 )
 
-func GeneratePackConfig(launchArgs []string) {
+func GeneratePackConfig(launchArgs []string, coreFile string) {
 	baseDir, configFile := checkIfConfigDirExist(launchArgs)
+
 	fmt.Printf("Generating packdl config from '%v'\n", baseDir)
 	fmt.Printf("Using config file '%v'\n", configFile)
 
 	packConfig := loadPackIfExist(configFile)
 
-	core := parser.ParseCore(baseDir)
+	core := parser.ParseCore(baseDir, coreFile)
 	packConfig.Core = core
 
 	plugins := parser.ParseBukkitPlugins(baseDir)
@@ -29,6 +31,7 @@ func GeneratePackConfig(launchArgs []string) {
 		util.ClickToExit()
 	}
 
+	fmt.Printf("Saving packdl config into '%v'\n", configFile)
 	config.SavePackConfig(packConfig, configFile)
 }
 
@@ -39,22 +42,29 @@ func checkIfConfigDirExist(launchArgs []string) (baseDir string, configFile stri
 		return
 	}
 
-	if len(launchArgs) < 2 {
+	if len(launchArgs) < 1 {
 		return baseDir, filepath.Join(baseDir, config.DefaultConfigFileName)
 	}
 
-	stat, err := os.Stat(launchArgs[1])
-	if errors.Is(err, os.ErrNotExist) {
-		fmt.Printf("Path '%v' not exist!\n", launchArgs[1])
+	targetPath := filepath.Clean(launchArgs[0])
+	targetPath = strings.Trim(targetPath, `"`)
+
+	stat, err := os.Stat(targetPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Printf("Path '%v' not exist!\n", targetPath)
+		} else {
+			fmt.Printf("Error on opening path '%v': %v\n", targetPath, err)
+		}
 		os.Exit(1)
 	}
 
 	if !stat.IsDir() {
-		baseDir = filepath.Dir(launchArgs[1])
-		return baseDir, launchArgs[1]
+		baseDir = filepath.Dir(targetPath)
+		return baseDir, targetPath
 	}
 
-	baseDir = launchArgs[1]
+	baseDir = targetPath
 	configFile = filepath.Join(baseDir, config.DefaultConfigFileName)
 
 	return baseDir, configFile

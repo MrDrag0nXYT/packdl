@@ -12,7 +12,7 @@ import (
 
 var ErrNoLinkOrFileProviden = errors.New("No link or file providen")
 
-func downloadCore(client *http.Client, clientVersion string, baseDir string, core model.Core) error {
+func DownloadCore(client *http.Client, clientVersion string, baseDir string, core model.Core) error {
 	coreName := config.Unknown
 	if core.Name != "" {
 		coreName = core.Name
@@ -46,7 +46,7 @@ func downloadCore(client *http.Client, clientVersion string, baseDir string, cor
 	return ErrNoLinkOrFileProviden
 }
 
-func downloadModifications(client *http.Client, clientVersion string, baseDir string, mods []model.Modification, modsType model.ModificationType) error {
+func DownloadModifications(client *http.Client, clientVersion string, baseDir string, mods []model.Modification, modsType model.ModificationType) error {
 	folderName := modsType.GetFolder()
 	baseDir = filepath.Join(baseDir, folderName)
 

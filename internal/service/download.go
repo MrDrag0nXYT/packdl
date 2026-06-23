@@ -77,7 +77,7 @@ func saveFile(resp *http.Response, outName string, filePath string) error {
 		return fmt.Errorf("Error while creating file: %w", err)
 	}
 
-	pw := ProgressWriter{
+	pw := util.ProgressWriter{
 		FileName:   outName,
 		TotalBytes: uint64(resp.ContentLength),
 	}

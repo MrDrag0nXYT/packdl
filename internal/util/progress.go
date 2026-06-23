@@ -1,11 +1,10 @@
-package service
+package util
 
 import (
 	"fmt"
-	"packdl/internal/util"
 )
 
-const ClearLine = "\r\x1b[K"
+const clearLine = "\r\x1b[K"
 
 type ProgressWriter struct {
 	FileName    string
@@ -28,9 +27,9 @@ func (pw *ProgressWriter) Write(b []byte) (int, error) {
 
 func updateProgress(pw *ProgressWriter) {
 	fmt.Printf("%vDownloading '%v': %v / %v",
-		ClearLine,
+		clearLine,
 		pw.FileName,
-		util.FormatBytes(pw.WritedBytes),
-		util.FormatBytes(pw.TotalBytes),
+		FormatBytes(pw.WritedBytes),
+		FormatBytes(pw.TotalBytes),
 	)
 }
